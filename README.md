@@ -263,6 +263,10 @@ Manually trigger E2E tests with custom configuration:
    - `async_client`: Raw httpx AsyncClient (for custom requests)
    - `sync_client`: Raw httpx Client (for sync tests)
 
+## Sample Test Report
+We use allure report to create test reports in html output. Here's a sample from one of the runs in CI
+<img width="1726" height="1036" alt="image" src="https://github.com/user-attachments/assets/906dbcdf-8062-4dcc-ba0f-f13b4010b384" />
+
 ## Troubleshooting
 
 ### "ModuleNotFoundError: No module named 'mistral_ai_api_client'"
