@@ -106,7 +106,27 @@ jobs:
           uv run pytest tests/e2e \
             -v \
             --timeout=600 \
+            --log-cli-level=INFO \
+            --alluredir=allure-results \
             --junitxml=test-results.xml
+
+      - name: Install Allure CLI
+        if: always()
+        run: |
+          wget -q https://github.com/allure-framework/allure2/releases/download/2.32.0/allure-2.32.0.tgz
+          tar -xzf allure-2.32.0.tgz
+          echo "$PWD/allure-2.32.0/bin" >> $GITHUB_PATH
+
+      - name: Generate Allure report
+        if: always()
+        run: allure generate allure-results -o allure-report --clean
+
+      - name: Upload Allure report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-report
+          path: allure-report/
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
