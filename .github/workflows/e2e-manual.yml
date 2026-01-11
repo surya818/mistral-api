@@ -1,0 +1,107 @@
+name: E2E Tests (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Mistral API Base URL'
+        required: false
+        default: 'https://api.mistral.ai'
+        type: string
+      environment:
+        description: 'GitHub Environment (for secrets)'
+        required: false
+        default: 'production'
+        type: choice
+        options:
+          - 'production'
+          - 'staging'
+      python_version:
+        description: 'Python version'
+        required: false
+        default: '3.12'
+        type: choice
+        options:
+          - '3.11'
+          - '3.12'
+          - '3.13'
+      test_markers:
+        description: 'Pytest markers to filter tests (e.g., "e2e", "smoke")'
+        required: false
+        default: 'e2e'
+        type: string
+
+env:
+  UV_CACHE_DIR: /tmp/.uv-cache
+
+jobs:
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python ${{ inputs.python_version }}
+        run: uv python install ${{ inputs.python_version }}
+
+      - name: Create .env file
+        run: |
+          cat > .env << 'EOF'
+          MISTRAL_BASE_URL=${{ inputs.base_url }}
+          MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }}
+          EOF
+          echo "Created .env with BASE_URL: ${{ inputs.base_url }}"
+
+      - name: Setup project
+        run: make setup
+
+      - name: Run E2E tests
+        run: |
+          make test-e2e 2>&1 | tee test-output.log
+        env:
+          MISTRAL_BASE_URL: ${{ inputs.base_url }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+
+      - name: Run tests with JUnit output
+        if: always()
+        run: |
+          uv run pytest tests/e2e \
+            -v \
+            -m "${{ inputs.test_markers }}" \
+            --timeout=600 \
+            --junitxml=test-results.xml \
+            || true
+        env:
+          MISTRAL_BASE_URL: ${{ inputs.base_url }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-py${{ inputs.python_version }}
+          path: |
+            test-results.xml
+            test-output.log
+
+      - name: Test Summary
+        if: always()
+        run: |
+          echo "## Test Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Base URL:** ${{ inputs.base_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment:** ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Python Version:** ${{ inputs.python_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Test Markers:** ${{ inputs.test_markers }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Results" >> $GITHUB_STEP_SUMMARY
+          if [ -f test-results.xml ]; then
+            echo "Test results uploaded as artifact." >> $GITHUB_STEP_SUMMARY
+          fi

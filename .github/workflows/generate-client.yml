@@ -1,0 +1,106 @@
+name: Generate API Client
+
+on:
+  push:
+    paths:
+      - 'specs/openapi.yaml'
+      - 'scripts/generate_client.sh'
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      openapi_url:
+        description: 'URL to fetch OpenAPI spec from (optional)'
+        required: false
+        default: ''
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  generate-client:
+    name: Generate Mistral API Client
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python
+        run: uv python install ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Update OpenAPI spec from URL
+        if: ${{ github.event.inputs.openapi_url != '' }}
+        run: |
+          curl -sL "${{ github.event.inputs.openapi_url }}" -o specs/openapi.yaml
+          echo "Updated OpenAPI spec from: ${{ github.event.inputs.openapi_url }}"
+
+      - name: Fetch latest Mistral OpenAPI spec
+        if: ${{ github.event.inputs.openapi_url == '' }}
+        run: |
+          curl -sL "https://docs.mistral.ai/openapi.yaml" -o specs/openapi.yaml
+          echo "Updated OpenAPI spec from Mistral docs"
+
+      - name: Generate API client
+        run: |
+          chmod +x scripts/generate_client.sh
+          ./scripts/generate_client.sh
+
+      - name: Run linting on generated code
+        run: uv run ruff check src/generated_client --fix || true
+
+      - name: Format generated code
+        run: uv run ruff format src/generated_client || true
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: regenerate Mistral API client"
+          title: "chore: Regenerate Mistral API Client"
+          body: |
+            ## Automated Client Regeneration
+
+            This PR was automatically generated because the OpenAPI specification was updated.
+
+            ### Changes
+            - Updated `specs/openapi.yaml` from Mistral docs
+            - Regenerated API client in `src/generated_client/`
+
+            ### Checklist
+            - [ ] Review generated code changes
+            - [ ] Ensure tests pass
+            - [ ] Update any custom code that depends on changed APIs
+          branch: chore/regenerate-api-client
+          delete-branch: true
+          labels: |
+            automated
+            api-client
+            dependencies
+
+      - name: Report no changes
+        if: steps.changes.outputs.has_changes == 'false'
+        run: echo "No changes detected in generated client"
