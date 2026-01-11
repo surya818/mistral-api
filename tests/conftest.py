@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 
 
 # Add generated client to path
-sys.path.insert(0, str(Path(__file__).parent / ".." / "src" / "generated_client"))
+sys.path.insert(0, str(Path(__file__).parent / ".." / "generated_client"))
 
 from mistral_ai_api_client import AuthenticatedClient
 
