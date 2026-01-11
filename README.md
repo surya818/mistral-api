@@ -1,6 +1,6 @@
 # Mistral API Test Automation
 
-A production-ready Python API test automation framework for the [Mistral AI API](https://docs.mistral.ai/), built with industry best practices.
+A Python API test automation framework for the [Mistral AI API](https://docs.mistral.ai/), built with best practices.
 
 ## Features
 
