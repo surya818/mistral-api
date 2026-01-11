@@ -6,15 +6,17 @@ import json
 import logging
 import os
 import sys
-from collections.abc import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator, Callable, Generator
+from pathlib import Path
 from typing import Any
 
 import httpx
 import pytest
 from dotenv import load_dotenv
 
+
 # Add generated client to path
-sys.path.insert(0, str(os.path.join(os.path.dirname(__file__), "..", "src", "generated_client")))
+sys.path.insert(0, str(Path(__file__).parent / ".." / "src" / "generated_client"))
 
 from mistral_ai_api_client import AuthenticatedClient
 
@@ -71,6 +73,7 @@ async def _async_log_response(response: httpx.Response) -> None:
 # CONFIGURATION
 # =============================================================================
 
+
 @pytest.fixture(scope="session")
 def base_url() -> str:
     """Base URL for Mistral API."""
@@ -98,6 +101,7 @@ def auth_headers(api_key: str) -> dict[str, str]:
 # =============================================================================
 # HTTP CLIENTS
 # =============================================================================
+
 
 @pytest.fixture(scope="session")
 def sync_client(base_url: str, auth_headers: dict[str, str]) -> Generator[httpx.Client, None, None]:
@@ -135,6 +139,7 @@ async def async_client(
 # GENERATED API CLIENT
 # =============================================================================
 
+
 @pytest.fixture
 async def api_client(base_url: str, api_key: str) -> AsyncGenerator[AuthenticatedClient, None]:
     """Generated API client with type-safe methods and logging.
@@ -160,6 +165,7 @@ async def api_client(base_url: str, api_key: str) -> AsyncGenerator[Authenticate
 # =============================================================================
 # TEST DATA FIXTURES
 # =============================================================================
+
 
 @pytest.fixture
 def sample_chat_messages() -> list[dict[str, str]]:
@@ -193,8 +199,9 @@ def sample_embedding_request() -> dict[str, Any]:
 # UTILITY FIXTURES
 # =============================================================================
 
+
 @pytest.fixture
-def assert_valid_response():
+def assert_valid_response() -> Callable[[httpx.Response, int, list[str] | None], dict[str, Any]]:
     """Factory fixture for validating API responses."""
 
     def _assert_valid_response(
@@ -203,7 +210,7 @@ def assert_valid_response():
         expected_keys: list[str] | None = None,
     ) -> dict[str, Any]:
         assert response.status_code == expected_status
-        data = response.json()
+        data: dict[str, Any] = response.json()
         if expected_keys:
             for key in expected_keys:
                 assert key in data, f"Expected key '{key}' not found in response"

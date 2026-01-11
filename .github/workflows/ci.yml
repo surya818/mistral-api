@@ -35,6 +35,11 @@ jobs:
       - name: Install dependencies
         run: uv sync --dev
 
+      - name: Generate API client
+        run: |
+          chmod +x scripts/generate_client.sh
+          ./scripts/generate_client.sh
+
       - name: Run Ruff linter
         run: uv run ruff check --output-format=github .
 
@@ -59,6 +64,11 @@ jobs:
 
       - name: Install dependencies
         run: uv sync --dev
+
+      - name: Generate API client
+        run: |
+          chmod +x scripts/generate_client.sh
+          ./scripts/generate_client.sh
 
       - name: Run MyPy
         run: uv run mypy src tests --ignore-missing-imports
@@ -88,6 +98,11 @@ jobs:
       - name: Install dependencies
         run: uv sync --dev
 
+      - name: Generate API client
+        run: |
+          chmod +x scripts/generate_client.sh
+          ./scripts/generate_client.sh
+
       - name: Run E2E tests
         env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
@@ -115,12 +130,18 @@ jobs:
         uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Set up Python
         run: uv python install ${{ env.PYTHON_VERSION }}
 
       - name: Install dependencies
         run: uv sync --dev
+
+      - name: Generate API client
+        run: |
+          chmod +x scripts/generate_client.sh
+          ./scripts/generate_client.sh
 
       - name: Run Bandit security scan
         run: uv run ruff check --select=S .

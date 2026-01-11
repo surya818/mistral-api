@@ -7,7 +7,6 @@ These tests verify embedding generation functionality using the generated client
 from http import HTTPStatus
 
 import pytest
-
 from mistral_ai_api_client import AuthenticatedClient
 from mistral_ai_api_client.api.embeddings import embeddings_v1_embeddings_post
 from mistral_ai_api_client.models import EmbeddingRequest, EmbeddingResponse
@@ -104,5 +103,8 @@ class TestEmbeddings:
         # than to the programming text (2)
         company_and_fruit_similarity = dot_product(embeddings[0], embeddings[1])
         company_similarity = dot_product(embeddings[1], embeddings[2])
-        print(f"Company similarity{company_similarity} - Company and fruit Similarity{company_and_fruit_similarity}")
+        print(
+            f"Company similarity{company_similarity} - "
+            f"Company and fruit Similarity{company_and_fruit_similarity}"
+        )
         assert company_similarity > company_and_fruit_similarity

@@ -8,7 +8,6 @@ from http import HTTPStatus
 
 import httpx
 import pytest
-
 from mistral_ai_api_client import AuthenticatedClient
 from mistral_ai_api_client.api.chat import chat_completion_v1_chat_completions_post
 from mistral_ai_api_client.models import (
@@ -73,7 +72,7 @@ class TestChatCompletion:
         assert response1.status_code == HTTPStatus.OK
         result1 = response1.parsed
         assert isinstance(result1, ChatCompletionResponse)
-        assistant_content = result1.choices[0].message.content
+        assert result1.choices[0].message.content is not None
 
         # Turn 2: Follow-up question with conversation history
         request2 = ChatCompletionRequest(

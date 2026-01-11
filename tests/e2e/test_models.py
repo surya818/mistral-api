@@ -8,7 +8,6 @@ using the generated type-safe API client.
 from http import HTTPStatus
 
 import pytest
-
 from mistral_ai_api_client import AuthenticatedClient
 from mistral_ai_api_client.api.models import (
     delete_model_v1_models_model_id_delete,
