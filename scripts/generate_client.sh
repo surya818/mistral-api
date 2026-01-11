@@ -15,7 +15,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 DEFAULT_SPEC_PATH="${PROJECT_ROOT}/specs/openapi.yaml"
-OUTPUT_DIR="${PROJECT_ROOT}/src/generated_client"
+OUTPUT_DIR="${PROJECT_ROOT}/generated_client"
 CLIENT_NAME="mistral_client"
 
 # Colors for output
@@ -87,4 +87,4 @@ else
     exit 1
 fi
 
-log_info "Done! You can now import the client from 'src.generated_client'"
+log_info "Done! You can now import the client from 'generated_client'"

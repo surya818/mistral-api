@@ -78,7 +78,7 @@ dmypy.json
 Thumbs.db
 
 # Generated client (regenerate with: make generate-client)
-src/generated_client/
+generated_client/
 
 # Local documentation
 docs/

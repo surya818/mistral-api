@@ -44,11 +44,11 @@ format:
 
 # Run type checker
 typecheck:
-	uv run mypy src/ tests/ --ignore-missing-imports
+	uv run mypy generated_client/ tests/ --ignore-missing-imports
 
 # Clean generated files and caches
 clean:
-	rm -rf src/generated_client/
+	rm -rf generated_client/
 	rm -rf .pytest_cache/
 	rm -rf .mypy_cache/
 	rm -rf .ruff_cache/

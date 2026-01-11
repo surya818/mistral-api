@@ -46,7 +46,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/generated_client"]
+packages = ["generated_client"]
 
 # =============================================================================
 # PYTEST CONFIGURATION
@@ -84,7 +84,7 @@ filterwarnings = [
 target-version = "py311"
 line-length = 100
 fix = true
-src = ["src", "tests"]
+src = ["generated_client", "tests"]
 
 [tool.ruff.lint]
 select = [
@@ -118,7 +118,7 @@ ignore = [
     "ARG001",  # unused arguments (fixtures)
     "PLR2004", # magic values in tests
 ]
-"src/generated_client/**/*.py" = [
+"generated_client/**/*.py" = [
     "ALL",     # ignore all rules in generated code
 ]
 

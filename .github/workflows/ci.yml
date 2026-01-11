@@ -71,7 +71,7 @@ jobs:
           ./scripts/generate_client.sh
 
       - name: Run MyPy
-        run: uv run mypy src tests --ignore-missing-imports
+        run: uv run mypy generated_client tests --ignore-missing-imports
 
   e2e-tests:
     name: E2E Tests (Python ${{ matrix.python-version }})

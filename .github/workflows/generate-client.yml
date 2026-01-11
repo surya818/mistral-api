@@ -39,7 +39,7 @@ jobs:
         run: uv python install ${{ env.PYTHON_VERSION }}
 
       - name: Install dependencies
-        run: uv sync --dev
+        run: uv sync --extra dev
 
       - name: Update OpenAPI spec from URL
         if: ${{ github.event.inputs.openapi_url != '' }}
@@ -59,10 +59,10 @@ jobs:
           ./scripts/generate_client.sh
 
       - name: Run linting on generated code
-        run: uv run ruff check src/generated_client --fix || true
+        run: uv run ruff check generated_client --fix || true
 
       - name: Format generated code
-        run: uv run ruff format src/generated_client || true
+        run: uv run ruff format generated_client || true
 
       - name: Check for changes
         id: changes
@@ -88,7 +88,7 @@ jobs:
 
             ### Changes
             - Updated `specs/openapi.yaml` from Mistral docs
-            - Regenerated API client in `src/generated_client/`
+            - Regenerated API client in `generated_client/`
 
             ### Checklist
             - [ ] Review generated code changes

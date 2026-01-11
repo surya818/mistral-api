@@ -9,9 +9,9 @@ repos:
     rev: v4.6.0
     hooks:
       - id: trailing-whitespace
-        exclude: ^src/generated_client/
+        exclude: ^generated_client/
       - id: end-of-file-fixer
-        exclude: ^src/generated_client/
+        exclude: ^generated_client/
       - id: check-yaml
         args: [--unsafe]
       - id: check-json
@@ -22,7 +22,7 @@ repos:
       - id: check-case-conflict
       - id: detect-private-key
       - id: debug-statements
-        exclude: ^src/generated_client/
+        exclude: ^generated_client/
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
 
@@ -32,9 +32,9 @@ repos:
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
-        exclude: ^src/generated_client/
+        exclude: ^generated_client/
       - id: ruff-format
-        exclude: ^src/generated_client/
+        exclude: ^generated_client/
 
   # Type checking with MyPy
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -46,7 +46,7 @@ repos:
           - httpx>=0.27.0
           - pytest>=8.0.0
         args: [--ignore-missing-imports]
-        exclude: ^src/generated_client/
+        exclude: ^generated_client/
 
   # Security scanning
   - repo: https://github.com/Yelp/detect-secrets
